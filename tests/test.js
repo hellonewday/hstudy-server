@@ -7,8 +7,6 @@ const server = supertest.agent(
   os.platform() === "win32" ? "http://localhost:8088" : "http://localhost:8088"
 );
 
-
-
 describe("/courses", () => {
   it("return courses list", (done) => {
     server
@@ -41,3 +39,5 @@ describe("/courses", () => {
       });
   });
 });
+
+// describe("business logic /courses ", () => {});
