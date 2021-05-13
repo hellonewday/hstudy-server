@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const PORT = process.env.PORT || 8088;
 const os = require("os");
+
+require("dotenv").config();
+
+const PORT = process.env.PORT || 8088;
 
 const courses = require("./routes/courses");
 
