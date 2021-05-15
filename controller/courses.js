@@ -10,19 +10,23 @@ cloudinary.config({
 module.exports.showCourses = (req, res, next) => {
   connection.query(
     `SELECT 
-    course.id,
-    course.courseName,
-    course.level,
-    course.description,
-    course.courseImage,
-    author.fullname AS author
+    Course.id,
+    Course.courseName,
+    Course.level,
+    Course.description,
+    Course.courseImage,
+    Author.fullname AS Author
 FROM
     Course
         INNER JOIN
-    Author ON course.author = author.id;`,
+    Author ON Course.author = Author.id;`,
     (error, document) => {
       if (error) return res.status(400).json({ success: false, error });
-      else return res.status(200).json({ result: document });
+      else
+        return res.status(200).json({
+          success: true,
+          response: { counts: document.length, data: document },
+        });
     }
   );
 };
@@ -30,21 +34,25 @@ FROM
 module.exports.findCourses = (req, res, next) => {
   connection.query(
     `SELECT 
-    course.id,
-    course.courseName,
-    course.level,
-    course.description,
-    course.courseImage,
-    author.fullname AS author
+    Course.id,
+    Course.courseName,
+    Course.level,
+    Course.description,
+    Course.courseImage,
+    Author.fullname AS Author
 FROM
     Course
         INNER JOIN
-    Author ON course.author = author.id
+    Author ON Course.author = Author.id
 WHERE
-    course.courseName LIKE '%${req.params.q}%';`,
+    Course.courseName LIKE '%${req.params.q}%';`,
     (error, document) => {
       if (error) return res.status(400).json({ success: false, error });
-      else return res.status(200).json({ result: document });
+      else
+        return res.status(200).json({
+          success: true,
+          response: { counts: document.length, data: document },
+        });
     }
   );
 };
