@@ -36,7 +36,7 @@ module.exports.searchProviders = (req, res, next) => {
 
 module.exports.createProvider = async (req, res, next) => {
   try {
-    let imageUrl = await cloudinary.v2.uploader.upload(req.body.file, {
+    let imageUrl = await cloudinary.v2.uploader.upload(req.file.path, {
       resource_type: "image",
     });
     connection.query(

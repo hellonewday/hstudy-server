@@ -9,6 +9,9 @@ const PORT = process.env.PORT || 8088;
 
 const courses = require("./routes/courses");
 const providers = require("./routes/providers");
+const authors = require("./routes/authors");
+const videos = require("./routes/videos");
+const students = require("./routes/students");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -19,6 +22,9 @@ app.use("/", express.static(__dirname));
 
 app.use("/courses", courses);
 app.use("/providers", providers);
+app.use("/authors", authors);
+app.use("/videos", videos);
+app.use("/students", students);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} on ${os.platform()}`);
