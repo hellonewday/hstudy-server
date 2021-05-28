@@ -110,7 +110,9 @@ module.exports.addStudent = (req, res, next) => {
   });
 };
 
-module.exports.updateStudent = (req, res, next) => {};
+module.exports.updateStudent = (req, res, next) => {
+  
+};
 
 module.exports.deleteStudent = (req, res, next) => {};
 

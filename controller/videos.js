@@ -35,28 +35,30 @@ WHERE
 
 module.exports.findVideosByCourse = (req, res, next) => {
   connection.query(
-    `SELECT 
-  VideoCourse.id,
-  VideoCourse.videoName,
-  VideoCourse.videoUrl,
-  Course.courseName
-FROM
-  VideoCourse
-      INNER JOIN
-  Course ON VideoCourse.course = Course.id
-WHERE
-  course = 1 AND videoName LIKE '%${req.params.q}%';`,
+    `
+    SELECT 
+      VideoCourse.id,
+      VideoCourse.videoName,
+      VideoCourse.videoUrl,
+      Course.courseName
+    FROM
+      VideoCourse
+          INNER JOIN
+      Course ON VideoCourse.course = Course.id
+    WHERE
+      course = ${req.query.course} AND VideoCourse.id = ${req.params.q};`,
     (error, documents) => {
       if (error) {
         return res.status(400).json({ success: false, error });
       } else
         return res.status(200).json({
           success: true,
-          response: { counts: documents.length, data: documents },
+          response: { data: documents[0] },
         });
     }
   );
 };
+
 
 module.exports.addVideoToCourse = async (req, res, next) => {
   try {
