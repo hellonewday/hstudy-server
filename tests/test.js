@@ -8,6 +8,7 @@ const server = supertest.agent(
 );
 
 describe("/courses", () => {
+
   it("return courses list", (done) => {
     server
       .get("/courses")
@@ -40,4 +41,3 @@ describe("/courses", () => {
   });
 });
 
-// describe("business logic /courses ", () => {});

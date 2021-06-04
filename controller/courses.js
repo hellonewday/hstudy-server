@@ -57,6 +57,12 @@ WHERE
   );
 };
 
+module.exports.showCoursesByStudent = (req,res,next) => {
+  
+}
+
+
+
 module.exports.addCourse = async (req, res, next) => {
   try {
     let image_upload = await cloudinary.v2.uploader.upload(req.file.path, {
