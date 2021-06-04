@@ -4,7 +4,7 @@ const should = require("should");
 const connection = require("../connection");
 
 const server = supertest.agent(
-  os.platform() === "win32" ? "http://localhost:8088" : "http://localhost:8088"
+  os.platform() === "win32" ? "http://localhost:8088" : "http://203.171.21.65:8088"
 );
 
 describe("/courses", () => {
