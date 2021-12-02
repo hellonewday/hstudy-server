@@ -4,7 +4,6 @@ services:
     image: mysql:8.0
     container_name: mysql_container
     environment:
-      MYSQL_USER: root
       MYSQL_PASSWORD: Passw@rd123
       MYSQL_DATABASE: hstudy
       MYSQL_HOST: localhost
