@@ -27,6 +27,8 @@ module.exports.getStudent = (req, res, next) => {
   Student.email,
   Student.avatarUrl,
   Student.dob,
+  Student.f_lang,
+  Student.p_lang,
   Account.username,
   Account.password
 FROM

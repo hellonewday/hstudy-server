@@ -13,6 +13,7 @@ const authors = require("./routes/authors");
 const videos = require("./routes/videos");
 const students = require("./routes/students");
 const manager = require("./routes/manager");
+const histories = require("./routes/histories");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -27,6 +28,7 @@ app.use("/authors", authors);
 app.use("/videos", videos);
 app.use("/students", students);
 app.use("/manager", manager);
+app.use("/histories",histories);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} on ${os.platform()}`);

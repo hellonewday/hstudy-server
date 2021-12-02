@@ -32,13 +32,13 @@ module.exports.findHistory = (req, res, next) => {
       } else
         return res.status(200).json({
           success: true,
-          response: { data: documents },
+          data: documents[0],
         });
     }
   );
 };
 
-module.exports.saveHistory = (req, res, next) => {
+module.exports.saveHistory = async (req, res, next) => {
   try {
     let videoUrl = await cloudinary.v2.uploader.upload(req.file.path, {
       resource_type: "video",
