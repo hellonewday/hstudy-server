@@ -29,7 +29,12 @@ module.exports.findHistory = (req, res, next) => {
     (error, documents) => {
       if (error) {
         return res.status(400).json({ success: false, error });
-      } else
+      }
+      if (documents.length == 0)
+        return res
+          .status(404)
+          .json({ success: false, message: "No history found!" });
+      else
         return res.status(200).json({
           success: true,
           data: documents[0],
@@ -44,18 +49,24 @@ module.exports.saveHistory = async (req, res, next) => {
       resource_type: "video",
     });
     connection.query(
-      `INSERT INTO History(logUrl,student,friend) VALUES ("${
+      `INSERT INTO History(logUrl,student,friend, type, duration) VALUES ("${
         videoUrl.secure_url
       }",${req.body.user},"Anonymous #${Math.floor(
         Math.random() * (1000 - 1 + 1) + 1
-      )}");
+      )}", "${req.body.type}",${req.body.duration});
           `,
       (error, response) => {
-        if (error) return res.status(400).json({ success: false, error });
-        else return res.status(201).json({ success: true, response });
+        if (error)
+          return res
+            .status(400)
+            .json({ success: false, message: "System error" });
+        else
+          return res
+            .status(201)
+            .json({ success: true, message: "Save history successfully" });
       }
     );
   } catch (UploadError) {
-    return res.status(401).json({ success: false, error: UploadError });
+    return res.status(401).json({ success: false, message: "Upload error" });
   }
 };

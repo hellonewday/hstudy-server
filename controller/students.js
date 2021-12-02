@@ -29,8 +29,8 @@ module.exports.getStudent = (req, res, next) => {
   Student.dob,
   Student.f_lang,
   Student.p_lang,
-  Account.username,
-  Account.password
+  Student.fullName,
+  Account.username
 FROM
   Student
       INNER JOIN
@@ -112,9 +112,7 @@ module.exports.addStudent = (req, res, next) => {
   });
 };
 
-module.exports.updateStudent = (req, res, next) => {
-  
-};
+module.exports.updateStudent = (req, res, next) => {};
 
 module.exports.deleteStudent = (req, res, next) => {};
 
@@ -123,24 +121,28 @@ module.exports.loginStudent = async (req, res, next) => {
     `SELECT * FROM Account WHERE username="${req.body.username}"`,
     (error, document) => {
       if (error) return res.status(400).json({ error });
+
       if (document.length === 0)
         return res.status(404).json({ success: false, message: "Not found" });
       else {
-        bcrypt.compare(req.body.password, req.body.password, (error, done) => {
-          if (error)
+        bcrypt.compare(req.body.password, document[0].password, (err, done) => {
+          console.log(done);
+          console.log(err);
+          if (done == false)
             return res
               .status(400)
               .json({ success: false, message: "Wrong password" });
+
+          let token = jwt.sign(
+            { id: document[0].id, username: document[0].username },
+            "s3cr3t",
+            {
+              expiresIn: "1w",
+            }
+          );
+          return res.status(200).json({ success: true, token: token });
         });
       }
-      let token = jwt.sign(
-        { id: document[0].id, username: document[0].username },
-        "s3cr3t",
-        {
-          expiresIn: "1w",
-        }
-      );
-      return res.status(200).json({ success: true, token: token });
     }
   );
 };
