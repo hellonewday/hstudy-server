@@ -9,6 +9,7 @@ cloudinary.config({
 });
 
 module.exports.findAllHistories = (req, res, next) => {
+  console.log("List hítories");
   connection.query(
     `SELECT * FROM History WHERE student = ${req.params.user}`,
     (error, documents) => {

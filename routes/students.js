@@ -29,7 +29,9 @@ router.get("/:sid", students.getStudent);
 router.post("/login", students.loginStudent);
 router.post("/", students.addStudent);
 
-router.patch("/:id", upload.single("image"), students.updateStudent);
+router.patch("/:id", students.updateStudent);
+router.patch("/:username/change",students.changePassword);
+router.patch("/:username/forgot",students.forgotPassword);
 
 router.delete("/:providerId", students.deleteStudent);
 

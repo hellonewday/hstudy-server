@@ -8,7 +8,8 @@ const connection = mysql.createConnection({
   password: os.platform() == "win32" ? "1234" : "Passw@rd123",
   database: "hstudy",
   connectTimeout: 60000,
-  multipleStatements: true
+  multipleStatements: true,
+  charset: 'utf8mb4'
 });
 
 connection.connect(err => {

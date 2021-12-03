@@ -3,6 +3,7 @@ const cloudinary = require("cloudinary");
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 cloudinary.config({
   cloud_name: "vn-esports",
   api_key: 996178356223912,
@@ -112,7 +113,76 @@ module.exports.addStudent = (req, res, next) => {
   });
 };
 
-module.exports.updateStudent = (req, res, next) => {};
+module.exports.updateStudent = (req, res, next) => {
+  connection.beginTransaction(async (error) => {
+    if (error) return res.status(400).json({ success: false, error });
+    var data = {};
+    connection.query(
+      `SELECT Account.username, Student.email, Student.dob, Student.avatarUrl, Student.f_lang, Student.p_lang, Student.fullName FROM Student INNER JOIN Account ON Student.account = Account.id WHERE sid = ${req.params.id};`,
+      (error, results, fields) => {
+        if (error)
+          return connection.rollback(() => {
+            return res
+              .status(400)
+              .json({ success: false, error, message: "Rollback" });
+          });
+        console.log("Get the ID for account");
+        data = results[0];
+      }
+    );
+
+    connection.query(
+      `UPDATE Account
+      SET username = "${req.body.username ? req.body.username : data.username}"
+      WHERE id = ${req.params.id};`,
+      (error, results) => {
+        if (error)
+          return connection.rollback(() => {
+            return res
+              .status(400)
+              .json({ success: false, error, message: "Rollback" });
+          });
+        console.log("Update new account");
+      }
+    );
+
+    connection.query(
+      `UPDATE Student
+      SET dob = "${
+        req.body.dob ? req.body.dob : data.dob.split("T")[0]
+      }", email = "${
+        req.body.email ? req.body.email : data.email
+      }", f_lang = "${
+        req.body.f_lang ? req.body.f_lang : data.f_lang
+      }", p_lang = "${req.body.p_lang ? req.body.p_lang : data.p_lang}",
+      fullName = "${req.body.fullName ? req.body.fullName : data.fullName}"
+      WHERE sid = ${req.params.id};`,
+      (error, results) => {
+        if (error)
+          return connection.rollback(() => {
+            return res
+              .status(400)
+              .json({ success: false, error, message: "Rollback" });
+          });
+        console.log("Update profile...");
+      }
+    );
+
+    connection.commit((error) => {
+      if (error)
+        return connection.rollback(() => {
+          return res
+            .status(400)
+            .json({ success: false, error, message: "Rollback" });
+        });
+      console.log("Commit transaction");
+      console.log(data);
+      return res
+        .status(200)
+        .json({ success: true, message: "Edit successfully" });
+    });
+  });
+};
 
 module.exports.deleteStudent = (req, res, next) => {};
 
@@ -143,6 +213,56 @@ module.exports.loginStudent = async (req, res, next) => {
           return res.status(200).json({ success: true, token: token });
         });
       }
+    }
+  );
+};
+
+module.exports.changePassword = (req, res, next) => {
+  connection.query(
+    `SELECT * FROM Account WHERE username = "${req.params.username}";`,
+    (error, response) => {
+      if (response.length == 0)
+        return res
+          .status(404)
+          .json({ success: false, message: "No account found." });
+      bcrypt.compare(req.body.old, response[0].password).then((success) => {
+        bcrypt.hash(req.body.new, 10, (error, hash) => {
+          connection.query(
+            `UPDATE Account SET password = '${hash}' WHERE username = '${req.params.username}';`,
+            (error, response) => {
+              if (error) return res.status(400).json({ success: false, error });
+              return res.status(200).json({
+                success: true,
+                message: "Update password successfully",
+              });
+            }
+          );
+        });
+      });
+    }
+  );
+};
+
+module.exports.forgotPassword = (req, res, next) => {
+  connection.query(
+    `SELECT * FROM Account WHERE username = "${req.params.username}";`,
+    (error, response) => {
+      if (response.length == 0)
+        return res
+          .status(404)
+          .json({ success: false, message: "No account found." });
+      bcrypt.hash(req.body.password, 10, (error, hash) => {
+        connection.query(
+          `UPDATE Account SET password = '${hash}' WHERE username = '${req.params.username}';`,
+          (error, response) => {
+            if (error) return res.status(400).json({ success: false, error });
+            return res.status(200).json({
+              success: true,
+              message: "Retrieve password successfully",
+            });
+          }
+        );
+      });
     }
   );
 };
