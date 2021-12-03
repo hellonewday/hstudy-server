@@ -11,7 +11,7 @@ cloudinary.config({
 });
 
 module.exports.listStudents = (req, res, next) => {
-  connection.query(`SELECT * FROM Student`, (error, documents) => {
+  connection.query(`SELECT * FROM student`, (error, documents) => {
     if (error) {
       return res.status(400).json({ success: false, error });
     } else
@@ -25,17 +25,17 @@ module.exports.listStudents = (req, res, next) => {
 module.exports.getStudent = (req, res, next) => {
   connection.query(
     `SELECT 
-  Student.email,
-  Student.avatarUrl,
-  Student.dob,
-  Student.f_lang,
-  Student.p_lang,
-  Student.fullName,
-  Account.username
+  student.email,
+  student.avatarUrl,
+  student.dob,
+  student.f_lang,
+  student.p_lang,
+  student.fullName,
+  account.username
 FROM
-  Student
+  student
       INNER JOIN
-  Account ON Student.account = Account.id
+  account ON student.account = account.id
 WHERE
   sid = ${req.params.sid};`,
     (error, document) => {
@@ -74,7 +74,7 @@ module.exports.addStudent = (req, res, next) => {
       }
     );
     connection.query(
-      `INSERT INTO Account(id,username,password) VALUES (@id,"${req.body.username}","${password}");`,
+      `INSERT INTO account(id,username,password) VALUES (@id,"${req.body.username}","${password}");`,
       (error, results) => {
         if (error)
           return connection.rollback(() => {
@@ -87,7 +87,7 @@ module.exports.addStudent = (req, res, next) => {
     );
 
     connection.query(
-      `INSERT INTO Student(account,email,avatarUrl,dob) VALUES (@id,"${req.body.email}","${avatar}","${req.body.dob}");
+      `INSERT INTO student(account,email,avatarUrl,dob) VALUES (@id,"${req.body.email}","${avatar}","${req.body.dob}");
         `,
       (error, results) => {
         if (error)
@@ -118,7 +118,7 @@ module.exports.updateStudent = (req, res, next) => {
     if (error) return res.status(400).json({ success: false, error });
     var data = {};
     connection.query(
-      `SELECT Account.username, Student.email, Student.dob, Student.avatarUrl, Student.f_lang, Student.p_lang, Student.fullName FROM Student INNER JOIN Account ON Student.account = Account.id WHERE sid = ${req.params.id};`,
+      `SELECT account.username, student.email, student.dob, student.avatarUrl, student.f_lang, student.p_lang, student.fullName FROM student INNER JOIN account ON student.account = account.id WHERE sid = ${req.params.id};`,
       (error, results, fields) => {
         if (error)
           return connection.rollback(() => {
@@ -132,7 +132,7 @@ module.exports.updateStudent = (req, res, next) => {
     );
 
     connection.query(
-      `UPDATE Account
+      `UPDATE account
       SET username = "${req.body.username ? req.body.username : data.username}"
       WHERE id = ${req.params.id};`,
       (error, results) => {
@@ -147,7 +147,7 @@ module.exports.updateStudent = (req, res, next) => {
     );
 
     connection.query(
-      `UPDATE Student
+      `UPDATE student
       SET dob = "${
         req.body.dob ? req.body.dob : data.dob.split("T")[0]
       }", email = "${
@@ -188,7 +188,7 @@ module.exports.deleteStudent = (req, res, next) => {};
 
 module.exports.loginStudent = async (req, res, next) => {
   connection.query(
-    `SELECT * FROM Account WHERE username="${req.body.username}"`,
+    `SELECT * FROM account WHERE username="${req.body.username}"`,
     (error, document) => {
       if (error) return res.status(400).json({ error });
 
@@ -219,7 +219,7 @@ module.exports.loginStudent = async (req, res, next) => {
 
 module.exports.changePassword = (req, res, next) => {
   connection.query(
-    `SELECT * FROM Account WHERE username = "${req.params.username}";`,
+    `SELECT * FROM account WHERE username = "${req.params.username}";`,
     (error, response) => {
       if (response.length == 0)
         return res
@@ -228,7 +228,7 @@ module.exports.changePassword = (req, res, next) => {
       bcrypt.compare(req.body.old, response[0].password).then((success) => {
         bcrypt.hash(req.body.new, 10, (error, hash) => {
           connection.query(
-            `UPDATE Account SET password = '${hash}' WHERE username = '${req.params.username}';`,
+            `UPDATE account SET password = '${hash}' WHERE username = '${req.params.username}';`,
             (error, response) => {
               if (error) return res.status(400).json({ success: false, error });
               return res.status(200).json({

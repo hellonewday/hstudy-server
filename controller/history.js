@@ -9,9 +9,8 @@ cloudinary.config({
 });
 
 module.exports.findAllHistories = (req, res, next) => {
-  console.log("List hítories");
   connection.query(
-    `SELECT * FROM History WHERE student = ${req.params.user}`,
+    `SELECT * FROM history WHERE student = ${req.params.user}`,
     (error, documents) => {
       if (error) {
         return res.status(400).json({ success: false, error });
@@ -26,7 +25,7 @@ module.exports.findAllHistories = (req, res, next) => {
 
 module.exports.findHistory = (req, res, next) => {
   connection.query(
-    `SELECT * FROM History WHERE id = ${req.params.id}`,
+    `SELECT * FROM history WHERE id = ${req.params.id}`,
     (error, documents) => {
       if (error) {
         return res.status(400).json({ success: false, error });
@@ -50,7 +49,7 @@ module.exports.saveHistory = async (req, res, next) => {
       resource_type: "video",
     });
     connection.query(
-      `INSERT INTO History(logUrl,student,friend, type, duration) VALUES ("${
+      `INSERT INTO history(logUrl,student,friend, type, duration) VALUES ("${
         videoUrl.secure_url
       }",${req.body.user},"Anonymous #${Math.floor(
         Math.random() * (1000 - 1 + 1) + 1
