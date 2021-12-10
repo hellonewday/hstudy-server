@@ -17,7 +17,7 @@ module.exports.findAllHistories = (req, res, next) => {
       } else
         return res.status(200).json({
           success: true,
-          response: { counts: documents.length, data: documents },
+          response: { counts: documents.length, data: documents.reverse() },
         });
     }
   );
