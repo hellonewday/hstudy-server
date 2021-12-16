@@ -8,7 +8,22 @@ cloudinary.config({
   api_secret: "rC8_6QyIf1DIbokVgSYe0VLsJwQ",
 });
 
-module.exports.findAllHistories = (req, res, next) => {
+module.exports.callStatistics = (req, res, next) => {
+  connection.query(
+    `SELECT type, SUM(duration) AS totalMiliseconds, COUNT(type) AS numberOfCalls FROM history WHERE student = ${req.params.user} group by type`,
+    (error, documents) => {
+      if (error) {
+        return res.status(400).json({ success: false, error });
+      } else
+        return res.status(200).json({
+          success: true,
+          statistics: documents,
+        });
+    }
+  );
+};
+
+module.exports.findAllHistories = (req,res,next) => {
   connection.query(
     `SELECT * FROM history WHERE student = ${req.params.user}`,
     (error, documents) => {
@@ -21,7 +36,7 @@ module.exports.findAllHistories = (req, res, next) => {
         });
     }
   );
-};
+}
 
 module.exports.findHistory = (req, res, next) => {
   connection.query(
@@ -70,3 +85,5 @@ module.exports.saveHistory = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "Upload error" });
   }
 };
+
+

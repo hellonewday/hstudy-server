@@ -31,7 +31,8 @@ module.exports.getStudent = (req, res, next) => {
   student.f_lang,
   student.p_lang,
   student.fullName,
-  account.username
+  account.username, 
+  student.gender
 FROM
   student
       INNER JOIN

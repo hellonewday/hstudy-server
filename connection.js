@@ -2,7 +2,7 @@ const mysql = require("mysql");
 const os = require("os");
 
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: os.platform() == "win32" ? "localhost" : "203.171.21.65",
   user: "root",
   password: os.platform() == "win32" ? "1234" : "Passw@rd123",
@@ -12,9 +12,5 @@ const connection = mysql.createConnection({
   charset: 'utf8mb4'
 });
 
-connection.connect(err => {
-  if (err) console.log(err.stack);
-  console.log("Connected as " + connection.threadId);
-});
 
 module.exports = connection;

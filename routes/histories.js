@@ -24,6 +24,7 @@ const upload = multer({
 });
 
 router.get("/all/:user",histories.findAllHistories);
+router.get("/statistics/:user",histories.callStatistics);
 router.get("/:id",histories.findHistory);
 router.post("/", upload.single("video"), histories.saveHistory);
 
