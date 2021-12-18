@@ -38,6 +38,21 @@ module.exports.findAllHistories = (req,res,next) => {
   );
 }
 
+module.exports.listAllHistories = (req,res,next) => {
+  connection.query(
+    `SELECT * FROM history`,
+    (error, documents) => {
+      if (error) {
+        return res.status(400).json({ success: false, error });
+      } else
+        return res.status(200).json({
+          success: true,
+          response: { counts: documents.length, data: documents.reverse() },
+        });
+    }
+  );
+}
+
 module.exports.findHistory = (req, res, next) => {
   connection.query(
     `SELECT * FROM history WHERE id = ${req.params.id}`,
@@ -59,31 +74,23 @@ module.exports.findHistory = (req, res, next) => {
 };
 
 module.exports.saveHistory = async (req, res, next) => {
-  try {
-    let videoUrl = await cloudinary.v2.uploader.upload(req.file.path, {
-      resource_type: "video",
-    });
-    connection.query(
-      `INSERT INTO history(logUrl,student,friend, type, duration) VALUES ("${
-        videoUrl.secure_url
-      }",${req.body.user},"Anonymous #${Math.floor(
-        Math.random() * (1000 - 1 + 1) + 1
-      )}", "${req.body.type}",${req.body.duration});
-          `,
-      (error, response) => {
-        if (error)
-          return res
-            .status(400)
-            .json({ success: false, message: "System error" });
-        else
-          return res
-            .status(201)
-            .json({ success: true, message: "Save history successfully" });
-      }
-    );
-  } catch (UploadError) {
-    return res.status(401).json({ success: false, message: "Upload error" });
-  }
+  connection.query(
+    `INSERT INTO history(student,friend,type, duration) VALUES (${req.body.user},"Anonymous #${Math.floor(
+      Math.random() * (1000 - 1 + 1) + 1
+    )}", "${req.body.type}",${req.body.duration});
+        `,
+    (error, response) => {
+      if (error)
+        return res
+          .status(400)
+          .json({ success: false, message: "System error" });
+      else
+        return res
+          .status(201)
+          .json({ success: true, message: "Save history successfully" });
+    }
+  );
+
 };
 
 

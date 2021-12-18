@@ -53,7 +53,7 @@ WHERE
 
 // Transaction: Query 1: Add account . Query 2: Add student.
 module.exports.addStudent = (req, res, next) => {
-  connection.beginTransaction(async (error) => {
+  connection.getConnection(async (error,conn) => {
     var avatar = gravatar.url(
       req.body.email,
       { s: "100", r: "x", d: "retro" },
@@ -62,11 +62,11 @@ module.exports.addStudent = (req, res, next) => {
     var password = await bcrypt.hash(req.body.password, 10);
 
     if (error) return res.status(400).json({ success: false, error });
-    connection.query(
+    conn.query(
       `SELECT @id:=MAX(id)+1 FROM Account;`,
       (error, results, fields) => {
         if (error)
-          return connection.rollback(() => {
+          return conn.rollback(() => {
             return res
               .status(400)
               .json({ success: false, error, message: "Rollback" });
@@ -74,11 +74,11 @@ module.exports.addStudent = (req, res, next) => {
         // console.log("Get the ID for account");
       }
     );
-    connection.query(
+    conn.query(
       `INSERT INTO account(id,username,password) VALUES (@id,"${req.body.username}","${password}");`,
       (error, results) => {
         if (error)
-          return connection.rollback(() => {
+          return conn.rollback(() => {
             return res
               .status(400)
               .json({ success: false, error, message: "Rollback" });
@@ -87,12 +87,12 @@ module.exports.addStudent = (req, res, next) => {
       }
     );
 
-    connection.query(
-      `INSERT INTO student(account,email,avatarUrl,dob) VALUES (@id,"${req.body.email}","${avatar}","${req.body.dob}");
+    conn.query(
+      `INSERT INTO student(account,email,avatarUrl,fullName) VALUES (@id,"${req.body.email}","${avatar}", "${req.body.fullName}");
         `,
       (error, results) => {
         if (error)
-          return connection.rollback(() => {
+          return conn.rollback(() => {
             return res
               .status(400)
               .json({ success: false, error, message: "Rollback" });
@@ -101,9 +101,9 @@ module.exports.addStudent = (req, res, next) => {
       }
     );
 
-    connection.commit((error) => {
+    conn.commit((error) => {
       if (error)
-        return connection.rollback(() => {
+        return conn.rollback(() => {
           return res
             .status(400)
             .json({ success: false, error, message: "Rollback" });
@@ -115,14 +115,14 @@ module.exports.addStudent = (req, res, next) => {
 };
 
 module.exports.updateStudent = (req, res, next) => {
-  connection.beginTransaction(async (error) => {
+  connection.getConnection(async (error, conn) => {
     if (error) return res.status(400).json({ success: false, error });
     var data = {};
-    connection.query(
+    conn.query(
       `SELECT account.username, student.email, student.dob, student.avatarUrl, student.f_lang, student.p_lang, student.fullName FROM student INNER JOIN account ON student.account = account.id WHERE sid = ${req.params.id};`,
       (error, results, fields) => {
         if (error)
-          return connection.rollback(() => {
+          return conn.rollback(() => {
             return res
               .status(400)
               .json({ success: false, error, message: "Rollback" });
@@ -132,25 +132,11 @@ module.exports.updateStudent = (req, res, next) => {
       }
     );
 
-    connection.query(
-      `UPDATE account
-      SET username = "${req.body.username ? req.body.username : data.username}"
-      WHERE id = ${req.params.id};`,
-      (error, results) => {
-        if (error)
-          return connection.rollback(() => {
-            return res
-              .status(400)
-              .json({ success: false, error, message: "Rollback" });
-          });
-        console.log("Update new account");
-      }
-    );
 
-    connection.query(
+    conn.query(
       `UPDATE student
       SET dob = "${
-        req.body.dob ? req.body.dob : data.dob.split("T")[0]
+        req.body.dob ? req.body.dob : data.dob
       }", email = "${
         req.body.email ? req.body.email : data.email
       }", f_lang = "${
@@ -160,7 +146,7 @@ module.exports.updateStudent = (req, res, next) => {
       WHERE sid = ${req.params.id};`,
       (error, results) => {
         if (error)
-          return connection.rollback(() => {
+          return conn.rollback(() => {
             return res
               .status(400)
               .json({ success: false, error, message: "Rollback" });
@@ -169,9 +155,9 @@ module.exports.updateStudent = (req, res, next) => {
       }
     );
 
-    connection.commit((error) => {
+    conn.commit((error) => {
       if (error)
-        return connection.rollback(() => {
+        return conn.rollback(() => {
           return res
             .status(400)
             .json({ success: false, error, message: "Rollback" });
@@ -205,7 +191,7 @@ module.exports.loginStudent = async (req, res, next) => {
               .json({ success: false, message: "Wrong password" });
 
           let token = jwt.sign(
-            { id: document[0].id, username: document[0].username },
+            { id: document[0].id, username: document[0].username},
             "s3cr3t",
             {
               expiresIn: "1w",

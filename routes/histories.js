@@ -23,6 +23,7 @@ const upload = multer({
   limits: 1024 * 1024 * 500,
 });
 
+router.get("/",histories.listAllHistories);
 router.get("/all/:user",histories.findAllHistories);
 router.get("/statistics/:user",histories.callStatistics);
 router.get("/:id",histories.findHistory);
