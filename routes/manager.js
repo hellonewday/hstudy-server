@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const manager = require("../controller/manager");
-router.get("/attendance/:courseId",manager.enrollmentAttendance);
+
+router.post("/login", manager.loginManager);
 
 module.exports = router;

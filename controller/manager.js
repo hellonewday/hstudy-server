@@ -1,45 +1,15 @@
 const connection = require("../connection");
 
-function checkStudentAttendance(s1, s2) {
-  s1.map((e) => {
-    if (s2.some((ele) => ele.vid === e.id)) {
-      e["isDone"] = true;
-    } else {
-      e["isDone"] = false;
-    }
-  });
-
-  return s1;
-}
-
-module.exports.enrollmentAttendance = (req, res, next) => {
+module.exports.loginManager = (req, res, next) => {
   connection.query(
-    `SELECT * FROM VideoCourse WHERE course = ${req.params.courseId};`,
-    (error, videos) => {
-      if (error) console.log(error);
-
-      connection.query(
-        `SELECT
-            StudentVideo.vid,
-            StudentVideo.status,
-            VideoCourse.videoName,
-            VideoCourse.videoUrl
-            FROM
-            StudentVideo
-                INNER JOIN
-            VideoCourse ON StudentVideo.vid = VideoCourse.id
-            WHERE
-            VideoCourse.course =${req.params.courseId}
-                AND StudentVideo.sid = ${req.query.user};`,
-        (error, student_videos) => {
-          if (error) console.log(error);
-
-          return res.status(200).json({
-            undone: videos.length - student_videos.length === 0 ? true : false,
-            data: checkStudentAttendance(videos, student_videos),
-          });
-        }
-      );
+    `SELECT * FROM Manager WHERE username="${req.body.username}" AND password="${req.body.password}"`,
+    (error, document) => {
+      if (error) return res.status(400).json({ error });
+      if (document.length === 0)
+        return res.status(404).json({ success: false, message: "Not found" });
+      else {
+        return res.status(200).json({ success: true });
+      }
     }
   );
 };

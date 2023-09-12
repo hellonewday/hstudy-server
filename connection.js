@@ -3,10 +3,10 @@ const os = require("os");
 
 
 const connection = mysql.createPool({
-  host: os.platform() == "win32" ? "localhost" : "203.171.21.65",
-  user: "root",
-  password: os.platform() == "win32" ? "1234" : "Passw@rd123",
-  database: "hstudy",
+  host: "94.74.99.84",
+  user: "dev",
+  password:"Vietnam@123",
+  database: "blindpay",
   connectTimeout: 60000,
   multipleStatements: true,
   charset: 'utf8mb4'
