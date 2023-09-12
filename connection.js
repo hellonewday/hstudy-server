@@ -3,7 +3,7 @@ const os = require("os");
 
 
 const connection = mysql.createPool({
-  host: "94.74.99.84",
+  host: os.platform() == "linux" ? "192.168.0.145" : "94.74.99.84",
   user: "dev",
   password:"Vietnam@123",
   database: "blindpay",
