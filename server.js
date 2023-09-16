@@ -8,7 +8,7 @@ const product = require("./routes/product");
 const pImage = require("./routes/product_image");
 const promotion = require("./routes/promotion");
 const cart = require("./routes/cart");
-
+const service = require("./routes/service");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 8088;
@@ -24,6 +24,7 @@ app.use("/products", product);
 app.use("/pimages", pImage);
 app.use("/promotions", promotion);
 app.use("/cart", cart);
+app.use("/service", service);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} on ${os.platform()}`);
